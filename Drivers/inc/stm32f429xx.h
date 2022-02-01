@@ -13,8 +13,8 @@
 /**
  * Miscellaneous macros
  */
-#define ENABLE									1
-#define DISABLE									0
+#define ENABLE									1U
+#define DISABLE									0U
 
 /**
  * Macros for base addresses of various memory
@@ -83,36 +83,38 @@ typedef struct
     volatile uint32_t AHB1RSTR;/****/
     volatile uint32_t AHB2RSTR;/****/
     volatile uint32_t AHB3RSTR;/****/
-    volatile uint32_t RESERVED;/****/
+    uint32_t RESERVED;/****/
     volatile uint32_t APB1RSTR;/****/
     volatile uint32_t APB2RSTR;/****/
-    volatile uint32_t RESERVED1;/****/
-    volatile uint32_t RESERVED2;/****/
+    uint32_t RESERVED1;/****/
+    uint32_t RESERVED2;/****/
     volatile uint32_t AHB1ENR;/****/
     volatile uint32_t AHB2ENR;/****/
     volatile uint32_t AHB3ENR;/****/
-    volatile uint32_t RESERVED3;/****/
+    uint32_t RESERVED3;/****/
     volatile uint32_t APB1ENR;/****/
     volatile uint32_t APB2ENR;/****/
-    volatile uint32_t RESERVED4;/****/
-    volatile uint32_t RESERVED5;/****/
+    uint32_t RESERVED4;/****/
+    uint32_t RESERVED5;/****/
     volatile uint32_t AHB1LPENR;/****/
     volatile uint32_t AHB2LPENR;/****/
     volatile uint32_t AHB3LPENR;/****/
-    volatile uint32_t RESERVED6;/****/
+    uint32_t RESERVED6;/****/
     volatile uint32_t APB1LPENR;/****/
     volatile uint32_t APB2LPENR;/****/
-    volatile uint32_t RESERVED7;/****/
-    volatile uint32_t RESERVED8;/****/
+    uint32_t RESERVED7;/****/
+    uint32_t RESERVED8;/****/
     volatile uint32_t BDCR;/****/
     volatile uint32_t CSR;/****/
-    volatile uint32_t RESERVED9;/****/
-    volatile uint32_t RESERVED10;/****/
+    uint32_t RESERVED9;/****/
+    uint32_t RESERVED10;/****/
     volatile uint32_t SSCGR;/****/
     volatile uint32_t PLLI2SCFGR;/****/
     volatile uint32_t PLLSAICFGR;/****/
     volatile uint32_t DCKCFGR;/****/
 } RCC_Registers_t;
+
+#define RCC										((RCC_Registers_t*) RCC_BASE_ADDR)
 
 /**
  * GPIO registers struct
@@ -132,4 +134,62 @@ typedef struct
     volatile uint32_t AFRL;/****/
     volatile uint32_t AFRH;/****/
 } GPIO_Registers_t;
+
+/**
+ * Type-casting each GPIO port base address to the registers struct
+ */
+#define GPIOA									((GPIO_Registers_t*) GPIOA_BASE_ADDR)
+#define GPIOB									((GPIO_Registers_t*) GPIOB_BASE_ADDR)
+#define GPIOC									((GPIO_Registers_t*) GPIOC_BASE_ADDR)
+#define GPIOD									((GPIO_Registers_t*) GPIOD_BASE_ADDR)
+#define GPIOE									((GPIO_Registers_t*) GPIOE_BASE_ADDR)
+#define GPIOF									((GPIO_Registers_t*) GPIOF_BASE_ADDR)
+#define GPIOG									((GPIO_Registers_t*) GPIOG_BASE_ADDR)
+#define GPIOH									((GPIO_Registers_t*) GPIOH_BASE_ADDR)
+#define GPIOI									((GPIO_Registers_t*) GPIOI_BASE_ADDR)
+#define GPIOJ									((GPIO_Registers_t*) GPIOJ_BASE_ADDR)
+#define GPIOK									((GPIO_Registers_t*) GPIOK_BASE_ADDR)
+
+/**
+ * RCC function macros to enable peripheral clocks
+ */
+#define GPIOA_CLK_EN()							(RCC->AHB1ENR |= (1 << 0))
+#define GPIOB_CLK_EN()							(RCC->AHB1ENR |= (1 << 1))
+#define GPIOC_CLK_EN()							(RCC->AHB1ENR |= (1 << 2))
+#define GPIOD_CLK_EN()							(RCC->AHB1ENR |= (1 << 3))
+#define GPIOE_CLK_EN()							(RCC->AHB1ENR |= (1 << 4))
+#define GPIOF_CLK_EN()							(RCC->AHB1ENR |= (1 << 5))
+#define GPIOG_CLK_EN()							(RCC->AHB1ENR |= (1 << 6))
+#define GPIOH_CLK_EN()							(RCC->AHB1ENR |= (1 << 7))
+#define GPIOI_CLK_EN()							(RCC->AHB1ENR |= (1 << 8))
+#define GPIOJ_CLK_EN()							(RCC->AHB1ENR |= (1 << 9))
+#define GPIOK_CLK_EN()							(RCC->AHB1ENR |= (1 << 10))
+/**
+ * RCC function macros to disable peripheral clocks
+ */
+#define GPIOA_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 0))
+#define GPIOB_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 1))
+#define GPIOC_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 2))
+#define GPIOD_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 3))
+#define GPIOE_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 4))
+#define GPIOF_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 5))
+#define GPIOG_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 6))
+#define GPIOH_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 7))
+#define GPIOI_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 8))
+#define GPIOJ_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 9))
+#define GPIOK_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 10))
+/**
+ * RCC function macros to reset peripherals
+ */
+#define GPIOA_RESET()							do{RCC->AHB1RSTR |= (1 << 0); RCC->AHB1RSTR &= ~(1 << 0);}while(0)
+#define GPIOB_RESET()							do{RCC->AHB1RSTR |= (1 << 1); RCC->AHB1RSTR &= ~(1 << 1);}while(0)
+#define GPIOC_RESET()							do{RCC->AHB1RSTR |= (1 << 2); RCC->AHB1RSTR &= ~(1 << 2);}while(0)
+#define GPIOD_RESET()							do{RCC->AHB1RSTR |= (1 << 3); RCC->AHB1RSTR &= ~(1 << 3);}while(0)
+#define GPIOE_RESET()							do{RCC->AHB1RSTR |= (1 << 4); RCC->AHB1RSTR &= ~(1 << 4);}while(0)
+#define GPIOF_RESET()							do{RCC->AHB1RSTR |= (1 << 5); RCC->AHB1RSTR &= ~(1 << 5);}while(0)
+#define GPIOG_RESET()							do{RCC->AHB1RSTR |= (1 << 6); RCC->AHB1RSTR &= ~(1 << 6);}while(0)
+#define GPIOH_RESET()							do{RCC->AHB1RSTR |= (1 << 7); RCC->AHB1RSTR &= ~(1 << 7);}while(0)
+#define GPIOI_RESET()							do{RCC->AHB1RSTR |= (1 << 8); RCC->AHB1RSTR &= ~(1 << 8);}while(0)
+#define GPIOJ_RESET()							do{RCC->AHB1RSTR |= (1 << 9); RCC->AHB1RSTR &= ~(1 << 9);}while(0)
+#define GPIOK_RESET()							do{RCC->AHB1RSTR |= (1 << 10); RCC->AHB1RSTR &= ~(1 << 10);}while(0)
 #endif /* INC_STM32F429XX_H_ */
