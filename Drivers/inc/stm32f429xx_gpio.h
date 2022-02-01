@@ -40,6 +40,12 @@
 #define GPIO_PIN_MODE_OUT			1
 #define GPIO_PIN_MODE_ALT_FUNC		2
 #define GPIO_PIN_MODE_ANALOG		3
+/**
+ * Interrupt pin modes
+ */
+#define GPIO_PIN_MODE_IT_FALLING    4
+#define GPIO_PIN_MODE_IT_RISING     5
+#define GPIO_PIN_MODE_IT_BOTH       6
 
 /**
  * Pin output type

@@ -70,6 +70,18 @@
  */
 
 /**
+ * Vector Table IRQ Number macros
+ * see ch12 vector table in Reference manual
+ */
+#define EXTI0_IRQ                               0x00000058U
+#define EXTI1_IRQ                               0x0000005CU
+#define EXTI2_IRQ                               0x00000060U
+#define EXTI3_IRQ                               0x00000064U
+#define EXTI4_IRQ                               0x00000068U
+#define EXTI9_5_IRQ                             0x0000009CU
+#define EXTI15_10_IRQ                           0x000000E0U
+
+/**
  * RCC registers struct
  * obtained from reference manual Ch. 6- RCC register map
  */
@@ -116,6 +128,18 @@ typedef struct
 
 #define RCC										((RCC_Registers_t*) RCC_BASE_ADDR)
 
+typedef struct
+{
+    volatile uint32_t MEMRMP;
+    volatile uint32_t PMC;
+    volatile uint32_t EXTICR[4];
+    uint32_t RESERVED;
+    uint32_t RESERVED1;
+    volatile uint32_t CMPCR;
+} SYSCFG_Registers_t;
+
+#define SYSCFG                                  ((SYSCFG_Registers_t*) SYSCFG_BASE_ADDRESS)
+
 /**
  * GPIO registers struct
  * obtained from reference manual Ch. 8- GPIO register map
@@ -135,6 +159,23 @@ typedef struct
     volatile uint32_t AFRH;/****/
 } GPIO_Registers_t;
 
+
+/**
+ * EXTI registers struct
+ * obtained from reference manual Ch. 12- EXTI register map
+ */
+typedef struct
+{
+    volatile uint32_t IMR;
+    volatile uint32_t EMR;
+    volatile uint32_t RSTR;
+    volatile uint32_t FTSR;
+    volatile uint32_t SWIER;
+    volatile uint32_t PR;
+} EXTI_Registers_t;
+
+#define EXTI                                    ((EXTI_Registers_t*) EXTI_BASE_ADDRESS)
+
 /**
  * Type-casting each GPIO port base address to the registers struct
  */
@@ -151,7 +192,7 @@ typedef struct
 #define GPIOK									((GPIO_Registers_t*) GPIOK_BASE_ADDR)
 
 /**
- * RCC function macros to enable peripheral clocks
+ * RCC function macros to enable clocks
  */
 #define GPIOA_CLK_EN()							(RCC->AHB1ENR |= (1 << 0))
 #define GPIOB_CLK_EN()							(RCC->AHB1ENR |= (1 << 1))
@@ -164,8 +205,10 @@ typedef struct
 #define GPIOI_CLK_EN()							(RCC->AHB1ENR |= (1 << 8))
 #define GPIOJ_CLK_EN()							(RCC->AHB1ENR |= (1 << 9))
 #define GPIOK_CLK_EN()							(RCC->AHB1ENR |= (1 << 10))
+
+#define SYSCFG_CLK_EN()                         (RCC->APB2 |= (1 << 14))
 /**
- * RCC function macros to disable peripheral clocks
+ * RCC function macros to disable clocks
  */
 #define GPIOA_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 0))
 #define GPIOB_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 1))
@@ -178,6 +221,8 @@ typedef struct
 #define GPIOI_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 8))
 #define GPIOJ_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 9))
 #define GPIOK_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 10))
+
+#define SYSCFG_CLK_DI()                         (RCC->APB2 &= (1 << 14))
 /**
  * RCC function macros to reset peripherals
  */
@@ -192,4 +237,6 @@ typedef struct
 #define GPIOI_RESET()							do{RCC->AHB1RSTR |= (1 << 8); RCC->AHB1RSTR &= ~(1 << 8);}while(0)
 #define GPIOJ_RESET()							do{RCC->AHB1RSTR |= (1 << 9); RCC->AHB1RSTR &= ~(1 << 9);}while(0)
 #define GPIOK_RESET()							do{RCC->AHB1RSTR |= (1 << 10); RCC->AHB1RSTR &= ~(1 << 10);}while(0)
+
+#define GPIOK_RESET()                           do{RCC->APB2RSTR |= (1 << 14); RCC->APB2RSTR &= ~(1 << 14);}while(0)
 #endif /* INC_STM32F429XX_H_ */

@@ -20,9 +20,85 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
         pGPIOHandle->pGPIOx->MODER &= ~(0x3 << (2 * pin_num));
         pGPIOHandle->pGPIOx->MODER |= (pGPIOHandle->pGPIOx_Pin_Config->pin_mode) << (2 * pin_num);
     }
-    else
+    else /**interrupt mode**/
     {
+        SYSCFG_CLK_EN();
 
+        EXTI->IMR |= 1 << pin_num;
+
+        if (pGPIOHandle->pGPIOx_Pin_Config->pin_mode == GPIO_PIN_MODE_IT_FALLING)
+        {
+            EXTI->FTSR |= 1 << pin_num;
+            EXTI->RTSR &= ~(1 << pin_num);
+        }
+        else if (pGPIOHandle->pGPIOx_Pin_Config->pin_mode == GPIO_PIN_MODE_IT_RISING)
+        {
+            EXTI->RTSR |= 1 << pin_num;
+            EXTI->FTSR &= ~(1 << pin_num);
+        }
+        else if (pGPIOHandle->pGPIOx_Pin_Config->pin_mode == GPIO_PIN_MODE_IT_BOTH)
+        {
+            EXTI->FTSR |= 1 << pin_num;
+            EXTI->RTSR |= 1 << pin_num;
+        }
+
+        //configure GPIO port in SYSCFG_EXTICR
+        uint32_t reg_num = (uint32_t) pin_num / 4;
+        if (pGPIOHandle->pGPIOx == GPIOA)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x0 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOB)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x01 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOC)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x2 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOD)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x3 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOE)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x4 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOF)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x5 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOG)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x6 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOH)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x7 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOI)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x8 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOJ)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x9 << (4 * (pin_num % 4));
+        }
+        else if (pGPIOHandle->pGPIOx == GPIOK)
+        {
+            SYSCFG->EXTICR[reg_num] &= ~(0xF << (4 * (pin_num % 4)));
+            SYSCFG->EXTICR[reg_num] |= 0x10 << (4 * (pin_num % 4));
+        }
     }
 
     pGPIOHandle->pGPIOx->OTYPER &= ~(1 << pin_num);
