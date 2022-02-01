@@ -1,7 +1,7 @@
 #include "stm32f429xx.h"
 #include "stm32f429xx_gpio.h"
 
-#define delay()                 for(int i = 0; i < 500000; ++i)
+#define delay()                 for(int i = 0; i < 500000/2; ++i)
 
 int main(void)
 {
@@ -14,12 +14,26 @@ int main(void)
     pGPIOHandleLED->pGPIOx_Pin_Config->pin_pupd = GPIO_PIN_NOPUPD;
     pGPIOHandleLED->pGPIOx_Pin_Config->pin_alt_func = 0x0;
 
+    GPIO_Handle_t *pGPIOHandleBtn = malloc(sizeof(GPIO_Handle_t));
+    pGPIOHandleBtn->pGPIOx = GPIOA;
+    pGPIOHandleBtn->pGPIOx_Pin_Config->pin_number = GPIO_PIN_0;
+    pGPIOHandleBtn->pGPIOx_Pin_Config->pin_mode = GPIO_PIN_MODE_IN;
+    pGPIOHandleBtn->pGPIOx_Pin_Config->pin_out_type = 0x0;
+    pGPIOHandleBtn->pGPIOx_Pin_Config->pin_speed = 0x0;
+    pGPIOHandleBtn->pGPIOx_Pin_Config->pin_pupd = 0x0;
+    pGPIOHandleBtn->pGPIOx_Pin_Config->pin_alt_func = 0x0;
+
     GPIO_Init(pGPIOHandleLED);
+    GPIO_Init(pGPIOHandleBtn);
 
     while (1)
     {
-        GPIO_TogglePin(GPIOG, GPIO_PIN_13);
-        delay();
+        if (GPIO_ReadPin(GPIOA, GPIO_PIN_0) == 1)/**In this case, the button will be high when the button is pressed**/
+        {
+            GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+            delay();/**Delay for software de-bouncing for button**/
+        }
+//        delay();
     }
 
     return 0;
