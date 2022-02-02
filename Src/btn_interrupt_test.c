@@ -1,3 +1,10 @@
+/*
+ * btn_interrupt_test.c
+ *
+ *  Created on: 02 Feb 2022
+ *      Author:
+ */
+
 #include <stdlib.h>
 #include "stm32f429xx.h"
 #include "stm32f429xx_gpio.h"
@@ -21,7 +28,7 @@ int main(void)
     GPIO_Handle_t *pGPIOHandleBtn = (GPIO_Handle_t*) malloc(sizeof(GPIO_Handle_t));
     pGPIOHandleBtn->pGPIOx = GPIOA;
     pGPIOHandleBtn->pGPIOx_Pin_Config->pin_number = GPIO_PIN_0;
-    pGPIOHandleBtn->pGPIOx_Pin_Config->pin_mode = GPIO_PIN_MODE_IN;
+    pGPIOHandleBtn->pGPIOx_Pin_Config->pin_mode = GPIO_PIN_MODE_IT_RISING;
     pGPIOHandleBtn->pGPIOx_Pin_Config->pin_out_type = 0x0;
     pGPIOHandleBtn->pGPIOx_Pin_Config->pin_speed = 0x0;
     pGPIOHandleBtn->pGPIOx_Pin_Config->pin_pupd = 0x0;
@@ -30,15 +37,16 @@ int main(void)
     GPIO_Init(pGPIOHandleBtn);
     free(pGPIOHandleBtn);
 
-    while (1)
-    {
-        if (GPIO_ReadPin(GPIOA, GPIO_PIN_0) == 1)/**In this case, the button will be high when the button is pressed**/
-        {
-            GPIO_TogglePin(GPIOG, GPIO_PIN_13);
-            delay();/**Delay for software de-bouncing for button**/
-        }
-//        delay();
-    }
+    GPIO_IRQConfig(EXTI0_IRQ_NUM, 10, ENABLE);
+
+    while (1);
 
     return 0;
+}
+
+void EXTI0_IRQHandler(void)
+{
+    GPIO_IRQHandler(GPIO_PIN_0);
+    GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+    delay();/**Delay for software de-bouncing for button**/
 }

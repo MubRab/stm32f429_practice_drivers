@@ -17,6 +17,21 @@
 #define DISABLE									0U
 
 /**
+ * Selected ARM Cortex M4 NVIC Register Addresses
+ */
+#define NVIC_ISER0                              ((volatile uint32_t*) 0xE000E100)
+#define NVIC_ISER1                              ((volatile uint32_t*) 0xE000E104)
+#define NVIC_ISER2                              ((volatile uint32_t*) 0xE000E108)
+
+#define NVIC_ICER0                              ((volatile uint32_t*) 0xE000E180)
+#define NVIC_ICER1                              ((volatile uint32_t*) 0xE000E184)
+#define NVIC_ICER2                              ((volatile uint32_t*) 0xE000E188)
+
+#define NVIC_IPR_BASE_ADDR                      ((volatile uint32_t*) 0xE000E400) /**this would be a better way, instead of all 60**/
+
+#define NUM_PR_BITS_IMPLEMENTED                 4
+
+/**
  * Macros for base addresses of various memory
  * obtained from Datasheet- Ch 5 memory map
  */
@@ -70,16 +85,28 @@
  */
 
 /**
- * Vector Table IRQ Number macros
+ * Vector Table IRQ Number (position) macros
  * see ch12 vector table in Reference manual
  */
-#define EXTI0_IRQ                               0x00000058U
-#define EXTI1_IRQ                               0x0000005CU
-#define EXTI2_IRQ                               0x00000060U
-#define EXTI3_IRQ                               0x00000064U
-#define EXTI4_IRQ                               0x00000068U
-#define EXTI9_5_IRQ                             0x0000009CU
-#define EXTI15_10_IRQ                           0x000000E0U
+#define EXTI0_IRQ_NUM                               6
+#define EXTI1_IRQ_NUM                               7
+#define EXTI2_IRQ_NUM                               8
+#define EXTI3_IRQ_NUM                               9
+#define EXTI4_IRQ_NUM                               10
+#define EXTI9_5_IRQ_NUM                             23
+#define EXTI15_10_IRQ_NUM                           40
+
+/**
+ * Vector Table IRQ Priority macros
+ * see ch12 vector table in Reference manual
+ */
+#define EXTI0_IRQ_P                                 13
+#define EXTI1_IRQ_P                                 14
+#define EXTI2_IRQ_P                                 15
+#define EXTI3_IRQ_P                                 16
+#define EXTI4_IRQ_P                                 17
+#define EXTI9_5_IRQ_P                               30
+#define EXTI15_10_IRQ_P                             47
 
 /**
  * RCC registers struct
@@ -128,18 +155,6 @@ typedef struct
 
 #define RCC										((RCC_Registers_t*) RCC_BASE_ADDR)
 
-typedef struct
-{
-    volatile uint32_t MEMRMP;
-    volatile uint32_t PMC;
-    volatile uint32_t EXTICR[4];
-    uint32_t RESERVED;
-    uint32_t RESERVED1;
-    volatile uint32_t CMPCR;
-} SYSCFG_Registers_t;
-
-#define SYSCFG                                  ((SYSCFG_Registers_t*) SYSCFG_BASE_ADDRESS)
-
 /**
  * GPIO registers struct
  * obtained from reference manual Ch. 8- GPIO register map
@@ -158,6 +173,22 @@ typedef struct
     volatile uint32_t AFRL;/****/
     volatile uint32_t AFRH;/****/
 } GPIO_Registers_t;
+
+/**
+ * SYSCFG registers struct
+ * obtained from reference manual Ch. 9
+ */
+typedef struct
+{
+    volatile uint32_t MEMRMP;
+    volatile uint32_t PMC;
+    volatile uint32_t EXTICR[4];
+    uint32_t RESERVED;
+    uint32_t RESERVED1;
+    volatile uint32_t CMPCR;
+} SYSCFG_Registers_t;
+
+#define SYSCFG                                  ((SYSCFG_Registers_t*) SYSCFG_BASE_ADDRESS)
 
 
 /**
@@ -206,7 +237,7 @@ typedef struct
 #define GPIOJ_CLK_EN()							(RCC->AHB1ENR |= (1 << 9))
 #define GPIOK_CLK_EN()							(RCC->AHB1ENR |= (1 << 10))
 
-#define SYSCFG_CLK_EN()                         (RCC->APB2 |= (1 << 14))
+#define SYSCFG_CLK_EN()                         (RCC->APB2ENR |= (1 << 14))
 /**
  * RCC function macros to disable clocks
  */
@@ -222,7 +253,7 @@ typedef struct
 #define GPIOJ_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 9))
 #define GPIOK_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 10))
 
-#define SYSCFG_CLK_DI()                         (RCC->APB2 &= (1 << 14))
+#define SYSCFG_CLK_DI()                         (RCC->APB2ENR &= (1 << 14))
 /**
  * RCC function macros to reset peripherals
  */
@@ -238,5 +269,5 @@ typedef struct
 #define GPIOJ_RESET()							do{RCC->AHB1RSTR |= (1 << 9); RCC->AHB1RSTR &= ~(1 << 9);}while(0)
 #define GPIOK_RESET()							do{RCC->AHB1RSTR |= (1 << 10); RCC->AHB1RSTR &= ~(1 << 10);}while(0)
 
-#define GPIOK_RESET()                           do{RCC->APB2RSTR |= (1 << 14); RCC->APB2RSTR &= ~(1 << 14);}while(0)
+#define SYSCFG_RESET()                          do{RCC->APB2RSTR |= (1 << 14); RCC->APB2RSTR &= ~(1 << 14);}while(0)
 #endif /* INC_STM32F429XX_H_ */

@@ -6,6 +6,9 @@
  */
 #include "stm32f429xx_gpio.h"
 
+static void GPIO_Clk(GPIO_Registers_t *pGPIOx, uint8_t en);/****/
+static void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);/****/
+
 /**
  *
  */
@@ -22,24 +25,27 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle)
     }
     else /**interrupt mode**/
     {
+        pGPIOHandle->pGPIOx->MODER |= (GPIO_PIN_MODE_IN << (2 * pin_num));
+
         SYSCFG_CLK_EN();
 
         EXTI->IMR |= 1 << pin_num;
 
+
         if (pGPIOHandle->pGPIOx_Pin_Config->pin_mode == GPIO_PIN_MODE_IT_FALLING)
         {
             EXTI->FTSR |= 1 << pin_num;
-            EXTI->RTSR &= ~(1 << pin_num);
+            EXTI->RSTR &= ~(1 << pin_num);
         }
         else if (pGPIOHandle->pGPIOx_Pin_Config->pin_mode == GPIO_PIN_MODE_IT_RISING)
         {
-            EXTI->RTSR |= 1 << pin_num;
+            EXTI->RSTR |= 1 << pin_num;
             EXTI->FTSR &= ~(1 << pin_num);
         }
         else if (pGPIOHandle->pGPIOx_Pin_Config->pin_mode == GPIO_PIN_MODE_IT_BOTH)
         {
             EXTI->FTSR |= 1 << pin_num;
-            EXTI->RTSR |= 1 << pin_num;
+            EXTI->RSTR |= 1 << pin_num;
         }
 
         //configure GPIO port in SYSCFG_EXTICR
@@ -318,13 +324,54 @@ void GPIO_TogglePin(GPIO_Registers_t *pGPIOx, uint8_t pinNumber)
  */
 void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en)
 {
-
+    if (en == ENABLE)
+    {
+        if (IRQNumber <= 31)
+        {
+            *NVIC_ISER0 |= (1 << IRQNumber);
+        }
+        else if (IRQNumber >= 31 || IRQNumber <= 63)
+        {
+            *NVIC_ISER1 |= (1 << (IRQNumber % 32));
+        }
+        GPIO_IRQPriorityConfig(IRQNumber, IRQPriority);
+    }
+    else
+    {
+        if (IRQNumber <= 31)
+        {
+            *NVIC_ICER0 |= (1 << IRQNumber);
+        }
+        else if (IRQNumber >= 31 || IRQNumber <= 63)
+        {
+            *NVIC_ICER1 |= (1 << (IRQNumber % 32));
+        }
+    }
 }
 
 /**
  *
  */
+void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
+{
+    uint8_t iprx = IRQNumber / 4;
+    uint8_t prix = (IRQNumber % 4) * 8;
+    /**
+     * (prix + (8 - NUM_PR_BITS_IMPLEMENTED) is necessary since the 4 LSB in the PRIx register is
+     * not implemented and all writes will be ignored
+     * NUM_PR_BITS_IMPLEMENTED is MCU specific. STM32 uses 4-bits
+     */
+    *(NVIC_IPR_BASE_ADDR + (iprx * 4)) |= IRQPriority << (prix + (8 - NUM_PR_BITS_IMPLEMENTED));
+}
+
+/**
+ * clear the EXTI PR register
+ */
 void GPIO_IRQHandler(uint8_t pinNumber)
 {
-
+    if (EXTI->PR & (1 << pinNumber))
+    {
+        /**to clear, we have to write a 1**/
+        EXTI->PR |= (1 << pinNumber);
+    }
 }
