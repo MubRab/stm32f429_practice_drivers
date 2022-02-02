@@ -7,7 +7,7 @@
 #include "stm32f429xx_gpio.h"
 
 static void GPIO_Clk(GPIO_Registers_t *pGPIOx, uint8_t en);/****/
-static void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);/****/
+static void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority);/****/
 
 /**
  *
@@ -352,7 +352,7 @@ void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en)
 /**
  *
  */
-void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
+void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority)
 {
     uint8_t iprx = IRQNumber / 4;
     uint8_t prix = (IRQNumber % 4) * 8;
@@ -361,7 +361,7 @@ void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
      * not implemented and all writes will be ignored
      * NUM_PR_BITS_IMPLEMENTED is MCU specific. STM32 uses 4-bits
      */
-    *(NVIC_IPR_BASE_ADDR + (iprx * 4)) |= IRQPriority << (prix + (8 - NUM_PR_BITS_IMPLEMENTED));
+    *(NVIC_IPR_BASE_ADDR + iprx) |= IRQPriority << (prix + (8 - NUM_PR_BITS_IMPLEMENTED));
 }
 
 /**

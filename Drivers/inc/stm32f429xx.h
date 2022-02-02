@@ -55,13 +55,19 @@
  * Selected macros for APB1 Bus peripherals
  * obtained from Datasheet Ch 5 table 13
  */
+#define SPI2_BASE_ADDR                          (APB1_BASE_ADDR + 0x3800U)
+#define SPI3_BASE_ADDR                          (APB1_BASE_ADDR + 0x3C00U)
 
 /**
  * Selected macros for APB2 Bus peripherals
  * obtained from Datasheet Ch 5 table 13
  */
+#define SPI1_BASE_ADDR                          (APB2_BASE_ADDR + 0x3000U)
+#define SPI4_BASE_ADDR                          (APB2_BASE_ADDR + 0x3400U)
 #define SYSCFG_BASE_ADDRESS						(APB2_BASE_ADDR + 0x3800U)
 #define EXTI_BASE_ADDRESS						(APB2_BASE_ADDR + 0x3C00U)
+#define SPI5_BASE_ADDR                          (APB2_BASE_ADDR + 0x5000U)
+#define SPI6_BASE_ADDR                          (APB2_BASE_ADDR + 0x5400U)
 
 /**
  * Selected macros for AHB1 Bus peripherals
@@ -237,6 +243,14 @@ typedef struct
 #define GPIOJ_CLK_EN()							(RCC->AHB1ENR |= (1 << 9))
 #define GPIOK_CLK_EN()							(RCC->AHB1ENR |= (1 << 10))
 
+/**SPI**/
+#define SPI1_CLK_EN()                           (RCC->RCC_APB2ENR |= (1<<12))
+#define SPI2_CLK_EN()                           (RCC->RCC_APB1ENR |= (1<<14))
+#define SPI3_CLK_EN()                           (RCC->RCC_APB1ENR |= (1<<15))
+#define SPI4_CLK_EN()                           (RCC->RCC_APB2ENR |= (1<<13))
+#define SPI5_CLK_EN()                           (RCC->RCC_APB2ENR |= (1<<20))
+#define SPI6_CLK_EN()                           (RCC->RCC_APB2ENR |= (1<<21))
+
 #define SYSCFG_CLK_EN()                         (RCC->APB2ENR |= (1 << 14))
 /**
  * RCC function macros to disable clocks
@@ -252,6 +266,14 @@ typedef struct
 #define GPIOI_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 8))
 #define GPIOJ_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 9))
 #define GPIOK_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 10))
+
+/**SPI**/
+#define SPI1_CLK_DI()                           (RCC->RCC_APB2ENR &= ~(1<<12))
+#define SPI2_CLK_DI()                           (RCC->RCC_APB1ENR &= ~(1<<14))
+#define SPI3_CLK_DI()                           (RCC->RCC_APB1ENR &= ~(1<<15))
+#define SPI4_CLK_DI()                           (RCC->RCC_APB2ENR &= ~(1<<13))
+#define SPI5_CLK_DI()                           (RCC->RCC_APB2ENR &= ~(1<<20))
+#define SPI6_CLK_DI()                           (RCC->RCC_APB2ENR &= ~(1<<21))
 
 #define SYSCFG_CLK_DI()                         (RCC->APB2ENR &= (1 << 14))
 /**
@@ -270,4 +292,6 @@ typedef struct
 #define GPIOK_RESET()							do{RCC->AHB1RSTR |= (1 << 10); RCC->AHB1RSTR &= ~(1 << 10);}while(0)
 
 #define SYSCFG_RESET()                          do{RCC->APB2RSTR |= (1 << 14); RCC->APB2RSTR &= ~(1 << 14);}while(0)
+
+
 #endif /* INC_STM32F429XX_H_ */
