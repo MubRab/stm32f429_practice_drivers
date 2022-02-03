@@ -3,6 +3,7 @@
  *
  *  Created on: Jan 31, 2022
  *      Author: MubRab
+ *      MCU Specific Device Header File
  */
 
 #ifndef INC_STM32F429XX_H_
@@ -29,7 +30,7 @@
 
 #define NVIC_IPR_BASE_ADDR                      ((volatile uint32_t*) 0xE000E400) /**this would be a better way, instead of all 60**/
 
-#define NUM_PR_BITS_IMPLEMENTED                 4
+#define NUM_PR_BITS_IMPLEMENTED                 4 /**These are the LSBs that are ignored in the IPR registers**/
 
 /**
  * Macros for base addresses of various memory
@@ -114,6 +115,8 @@
 #define EXTI9_5_IRQ_P                               30
 #define EXTI15_10_IRQ_P                             47
 
+/****************************** Peripheral Registers ****************************/
+
 /**
  * RCC registers struct
  * obtained from reference manual Ch. 6- RCC register map
@@ -181,6 +184,21 @@ typedef struct
 } GPIO_Registers_t;
 
 /**
+ * Type-casting each GPIO port base address to the registers struct
+ */
+#define GPIOA                                   ((GPIO_Registers_t*) GPIOA_BASE_ADDR)
+#define GPIOB                                   ((GPIO_Registers_t*) GPIOB_BASE_ADDR)
+#define GPIOC                                   ((GPIO_Registers_t*) GPIOC_BASE_ADDR)
+#define GPIOD                                   ((GPIO_Registers_t*) GPIOD_BASE_ADDR)
+#define GPIOE                                   ((GPIO_Registers_t*) GPIOE_BASE_ADDR)
+#define GPIOF                                   ((GPIO_Registers_t*) GPIOF_BASE_ADDR)
+#define GPIOG                                   ((GPIO_Registers_t*) GPIOG_BASE_ADDR)
+#define GPIOH                                   ((GPIO_Registers_t*) GPIOH_BASE_ADDR)
+#define GPIOI                                   ((GPIO_Registers_t*) GPIOI_BASE_ADDR)
+#define GPIOJ                                   ((GPIO_Registers_t*) GPIOJ_BASE_ADDR)
+#define GPIOK                                   ((GPIO_Registers_t*) GPIOK_BASE_ADDR)
+
+/**
  * SYSCFG registers struct
  * obtained from reference manual Ch. 9
  */
@@ -214,20 +232,29 @@ typedef struct
 #define EXTI                                    ((EXTI_Registers_t*) EXTI_BASE_ADDRESS)
 
 /**
- * Type-casting each GPIO port base address to the registers struct
+ * SPI registers struct
+ * Ch 28 - Register Map
  */
-#define GPIOA									((GPIO_Registers_t*) GPIOA_BASE_ADDR)
-#define GPIOB									((GPIO_Registers_t*) GPIOB_BASE_ADDR)
-#define GPIOC									((GPIO_Registers_t*) GPIOC_BASE_ADDR)
-#define GPIOD									((GPIO_Registers_t*) GPIOD_BASE_ADDR)
-#define GPIOE									((GPIO_Registers_t*) GPIOE_BASE_ADDR)
-#define GPIOF									((GPIO_Registers_t*) GPIOF_BASE_ADDR)
-#define GPIOG									((GPIO_Registers_t*) GPIOG_BASE_ADDR)
-#define GPIOH									((GPIO_Registers_t*) GPIOH_BASE_ADDR)
-#define GPIOI									((GPIO_Registers_t*) GPIOI_BASE_ADDR)
-#define GPIOJ									((GPIO_Registers_t*) GPIOJ_BASE_ADDR)
-#define GPIOK									((GPIO_Registers_t*) GPIOK_BASE_ADDR)
+typedef struct
+{
+    volatile uint32_t CR1;      /****/
+    volatile uint32_t CR2;      /****/
+    volatile uint32_t SR;       /****/
+    volatile uint32_t DR;       /****/
+    volatile uint32_t CRCPR;    /****/
+    volatile uint32_t RXCPR;    /****/
+    volatile uint32_t TXCRCR;   /****/
+    volatile uint32_t IS2CFGR;  /****/
+    volatile uint32_t IS2SPR;   /****/
+} SPI_Registers_t;
 
+#define SPI1                                    ((SPI_Registers_t*) SPI1_BASE_ADDR)
+#define SPI2                                    ((SPI_Registers_t*) SPI2_BASE_ADDR)
+#define SPI3                                    ((SPI_Registers_t*) SPI3_BASE_ADDR)
+#define SPI4                                    ((SPI_Registers_t*) SPI4_BASE_ADDR)
+#define SPI5                                    ((SPI_Registers_t*) SPI5_BASE_ADDR)
+#define SPI6                                    ((SPI_Registers_t*) SPI6_BASE_ADDR)
+/*********************************Function Macros******************************/
 /**
  * RCC function macros to enable clocks
  */
