@@ -271,12 +271,12 @@ typedef struct
 #define GPIOK_CLK_EN()							(RCC->AHB1ENR |= (1 << 10))
 
 /**SPI**/
-#define SPI1_CLK_EN()                           (RCC->RCC_APB2ENR |= (1<<12))
-#define SPI2_CLK_EN()                           (RCC->RCC_APB1ENR |= (1<<14))
-#define SPI3_CLK_EN()                           (RCC->RCC_APB1ENR |= (1<<15))
-#define SPI4_CLK_EN()                           (RCC->RCC_APB2ENR |= (1<<13))
-#define SPI5_CLK_EN()                           (RCC->RCC_APB2ENR |= (1<<20))
-#define SPI6_CLK_EN()                           (RCC->RCC_APB2ENR |= (1<<21))
+#define SPI1_CLK_EN()                           (RCC->APB2ENR |= (1<<12))
+#define SPI2_CLK_EN()                           (RCC->APB1ENR |= (1<<14))
+#define SPI3_CLK_EN()                           (RCC->APB1ENR |= (1<<15))
+#define SPI4_CLK_EN()                           (RCC->APB2ENR |= (1<<13))
+#define SPI5_CLK_EN()                           (RCC->APB2ENR |= (1<<20))
+#define SPI6_CLK_EN()                           (RCC->APB2ENR |= (1<<21))
 
 #define SYSCFG_CLK_EN()                         (RCC->APB2ENR |= (1 << 14))
 /**
@@ -295,12 +295,12 @@ typedef struct
 #define GPIOK_CLK_DI()							(RCC->AHB1ENR &= ~(1 << 10))
 
 /**SPI**/
-#define SPI1_CLK_DI()                           (RCC->RCC_APB2ENR &= ~(1<<12))
-#define SPI2_CLK_DI()                           (RCC->RCC_APB1ENR &= ~(1<<14))
-#define SPI3_CLK_DI()                           (RCC->RCC_APB1ENR &= ~(1<<15))
-#define SPI4_CLK_DI()                           (RCC->RCC_APB2ENR &= ~(1<<13))
-#define SPI5_CLK_DI()                           (RCC->RCC_APB2ENR &= ~(1<<20))
-#define SPI6_CLK_DI()                           (RCC->RCC_APB2ENR &= ~(1<<21))
+#define SPI1_CLK_DI()                           (RCC->APB2ENR &= ~(1<<12))
+#define SPI2_CLK_DI()                           (RCC->APB1ENR &= ~(1<<14))
+#define SPI3_CLK_DI()                           (RCC->APB1ENR &= ~(1<<15))
+#define SPI4_CLK_DI()                           (RCC->APB2ENR &= ~(1<<13))
+#define SPI5_CLK_DI()                           (RCC->APB2ENR &= ~(1<<20))
+#define SPI6_CLK_DI()                           (RCC->APB2ENR &= ~(1<<21))
 
 #define SYSCFG_CLK_DI()                         (RCC->APB2ENR &= (1 << 14))
 /**

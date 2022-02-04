@@ -68,6 +68,26 @@
 #define GPIO_PIN_PULL_DOWN			(uint32_t) 2
 
 /**
+ * Pin alternate functions
+ */
+#define GPIO_PIN_AF0                (uint32_t) 0
+#define GPIO_PIN_AF1                (uint32_t) 1
+#define GPIO_PIN_AF2                (uint32_t) 2
+#define GPIO_PIN_AF3                (uint32_t) 3
+#define GPIO_PIN_AF4                (uint32_t) 4
+#define GPIO_PIN_AF5                (uint32_t) 5
+#define GPIO_PIN_AF6                (uint32_t) 6
+#define GPIO_PIN_AF7                (uint32_t) 7
+#define GPIO_PIN_AF8                (uint32_t) 8
+#define GPIO_PIN_AF9                (uint32_t) 9
+#define GPIO_PIN_AF10               (uint32_t) 10
+#define GPIO_PIN_AF11               (uint32_t) 11
+#define GPIO_PIN_AF12               (uint32_t) 12
+#define GPIO_PIN_AF13               (uint32_t) 13
+#define GPIO_PIN_AF14               (uint32_t) 14
+#define GPIO_PIN_AF15               (uint32_t) 15
+
+/**
  * Struct for configuring each pin of the selected GPIO port
  */
 typedef struct

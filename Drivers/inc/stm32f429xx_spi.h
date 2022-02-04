@@ -33,6 +33,9 @@
 #define SPI_SSM_DI                      0
 #define SPI_SSM_EN                      1
 
+#define SPI_SSI_DI                      0
+#define SPI_SSI_EN                      1
+
 #define SPI_SPEED_CLK_DIV2              0
 #define SPI_SPEED_CLK_DIV4              2
 #define SPI_SPEED_CLK_DIV8              3
@@ -52,6 +55,7 @@ typedef struct
     uint32_t CPHA;
     uint32_t CPOL;
     uint32_t SSM;
+    uint32_t SSI;
     uint32_t CLK_Speed;
 } SPI_Config_t;
 
@@ -64,9 +68,10 @@ typedef struct
 /*******************API Function Prototypes***********************************/
 void SPI_Init(SPI_Handle_t *pSPIHandle);/****/
 void SPI_Reset(SPI_Registers_t *pSPIx);/****/
+void SPI_Control(SPI_Registers_t *pSPIx, uint8_t EN);
 
 
-void SPI_SendData(SPI_Registers_t *pSPIx, uint8_t *pTxBuffer, uint32_t size);
+void SPI_SendData(SPI_Registers_t *pSPIx, uint8_t *pData, uint32_t size);
 void SPI_ReceiveData(SPI_Registers_t *pSPIx, uint8_t *pRxBuffer, uint32_t size);
 
 void SPI_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en);/****/

@@ -7,7 +7,7 @@
 #include "stm32f429xx_spi.h"
 
 static void SPI_Clk(SPI_Registers_t *pSPIx, uint8_t en);
-static void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
+//static void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
 
 /**
  *TODO: instead of shifting by a literal number, rather use macros for the offset
@@ -49,11 +49,23 @@ void SPI_Init(SPI_Handle_t *pSPIHandle)
 
     pSPIHandle->pSPIx->CR1 |= (pSPIHandle->SPI_Config.SSM << 9);
 
+    if (pSPIHandle->SPI_Config.SSM == SPI_SSM_EN)
+    {
+        if (pSPIHandle->SPI_Config.SSI == SPI_SSI_DI)
+        {
+            pSPIHandle->pSPIx->CR1 &=  ~(1 << 8);
+        }
+        else if (pSPIHandle->SPI_Config.SSI == SPI_SSI_EN)
+        {
+            pSPIHandle->pSPIx->CR1 |=  (1 << 8);
+        }
+    }
+
     pSPIHandle->pSPIx->CR1 |= (pSPIHandle->SPI_Config.CLK_Speed << 3);
 }
 
 /**
- *
+ *TODO
  */
 void SPI_Reset(SPI_Registers_t *pSPIx)
 {
@@ -126,8 +138,43 @@ static void SPI_Clk(SPI_Registers_t *pSPIx, uint8_t en)
 /**
  *
  */
-void SPI_SendData(SPI_Registers_t *pSPIx, uint8_t *pTxBuffer, uint32_t size)
+void SPI_Control(SPI_Registers_t *pSPIx, uint8_t EN)
 {
+    if (EN == ENABLE)
+    {
+        pSPIx->CR1 |= (1 << 6);
+    }
+    else
+    {
+        pSPIx->CR1 &= ~(1 << 6);
+    }
+}
+
+/**
+ *pData is an array of length size consisting of one byte of data per index
+ *
+ *polling based sending of data
+ */
+void SPI_SendData(SPI_Registers_t *pSPIx, uint8_t *pData, uint32_t size)
+{
+    while (size > 0)
+    {
+        while (!(pSPIx->SR & (1 << 1)));
+
+        if (pSPIx->CR1 & (1 << 11)) /**16-bit**/
+        {
+            pSPIx->DR = *((uint16_t*) pData);
+            size -= 2;
+            pData += 2;
+        }
+        else /**8-bit**/
+        {
+            pSPIx->DR = *pData;
+            --size;
+            ++pData;
+        }
+
+    }
 
 }
 
