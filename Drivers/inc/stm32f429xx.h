@@ -10,6 +10,7 @@
 #define INC_STM32F429XX_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * Miscellaneous macros
@@ -95,6 +96,7 @@
  * Vector Table IRQ Number (position) macros
  * see ch12 vector table in Reference manual
  */
+/**GPIO**/
 #define EXTI0_IRQ_NUM                               6
 #define EXTI1_IRQ_NUM                               7
 #define EXTI2_IRQ_NUM                               8
@@ -102,6 +104,14 @@
 #define EXTI4_IRQ_NUM                               10
 #define EXTI9_5_IRQ_NUM                             23
 #define EXTI15_10_IRQ_NUM                           40
+
+/**SPI**/
+#define SPI1_IRQ_NUM                                35
+#define SPI2_IRQ_NUM                                36
+#define SPI3_IRQ_NUM                                51
+#define SPI4_IRQ_NUM                                84
+#define SPI5_IRQ_NUM                                85
+#define SPI6_IRQ_NUM                                86
 
 /**
  * Vector Table IRQ Priority macros
@@ -114,6 +124,14 @@
 #define EXTI4_IRQ_P                                 17
 #define EXTI9_5_IRQ_P                               30
 #define EXTI15_10_IRQ_P                             47
+
+/**SPI**/
+#define SPI1_IRQ_P                                  43
+#define SPI2_IRQ_P                                  42
+#define SPI3_IRQ_P                                  58
+#define SPI4_IRQ_P                                  91
+#define SPI5_IRQ_P                                  92
+#define SPI6_IRQ_P                                  93
 
 /****************************** Peripheral Registers ****************************/
 

@@ -19,7 +19,7 @@ int main(void)
     spi_pins->pGPIOx_Pin_Config->pin_mode = GPIO_PIN_MODE_ALT_FUNC;
     spi_pins->pGPIOx_Pin_Config->pin_speed = GPIO_PIN_SPEED_HIGH;
     spi_pins->pGPIOx_Pin_Config->pin_out_type = GPIO_PIN_OUT_PP;
-    spi_pins->pGPIOx_Pin_Config->pin_pupd = GPIO_PIN_NOPUPD;
+    spi_pins->pGPIOx_Pin_Config->pin_pupd = GPIO_PIN_PULL_UP; /**when driving a slave, it is better to use a pull up**/
     spi_pins->pGPIOx_Pin_Config->pin_alt_func = GPIO_PIN_AF5;
 
     /**SCLK**/
@@ -57,7 +57,7 @@ int main(void)
     /**first enable the peripheral**/
     SPI_Control(SPI2, ENABLE);
     SPI_SendData(SPI2, (uint8_t*) data, len);
-    SPI_Control(SPI2, DISABLE);
+    while (!SPI_Control(SPI2, DISABLE));
     while(1);
 
 

@@ -45,6 +45,14 @@
 #define SPI_SPEED_CLK_DIV128            7
 #define SPI_SPEED_CLK_DIV256            8
 
+#define SPI_READY                       0
+#define SPI_RX_BUSY                     1
+#define SPI_TX_BUSY                     2
+
+#define SPI_EVENT_TX_COMPLETE           1
+#define SPI_EVENT_RX_COMPLETE           2
+#define SPI_EVENT_OVERRUN_ERROR         3
+
 
 
 typedef struct
@@ -63,20 +71,35 @@ typedef struct
 {
     SPI_Registers_t *pSPIx;
     SPI_Config_t SPI_Config;
+    uint8_t *pTxBuffer;
+    uint8_t *pRxBuffer;
+    uint32_t TxSize;
+    uint32_t RxSize;
+    uint8_t TxState;
+    uint8_t RxState;
 } SPI_Handle_t;
 
 /*******************API Function Prototypes***********************************/
 void SPI_Init(SPI_Handle_t *pSPIHandle);/****/
 void SPI_Reset(SPI_Registers_t *pSPIx);/****/
-void SPI_Control(SPI_Registers_t *pSPIx, uint8_t EN);
+uint8_t SPI_Control(SPI_Registers_t *pSPIx, uint8_t EN);
 
 
-void SPI_SendData(SPI_Registers_t *pSPIx, uint8_t *pData, uint32_t size);
-void SPI_ReceiveData(SPI_Registers_t *pSPIx, uint8_t *pRxBuffer, uint32_t size);
+void SPI_SendData(SPI_Registers_t *pSPIx, uint8_t *pTxData, uint32_t size);
+void SPI_ReceiveData(SPI_Registers_t *pSPIx, uint8_t *pRxData, uint32_t size);
+
+uint8_t SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxData, uint32_t size);
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxData, uint32_t size);
 
 void SPI_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en);/****/
 //static void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);/****/
 void SPI_IRQHandler(SPI_Handle_t *pSPIHandle);/****/
+
+void SPI_ClearOVRFlag(SPI_Registers_t *pSPIx);
+void SPI_CloseTx(SPI_Handle_t *pSPIHandle);
+void SPI_CloseRx(SPI_Handle_t *pSPIHandle);
+
+void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle, uint8_t event);
 
 
 #endif /* INC_STM32F429XX_SPI_H_ */
