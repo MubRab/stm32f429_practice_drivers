@@ -30,7 +30,7 @@ int main(void)
     spi_pins->pGPIOx_Pin_Config->pin_number = GPIO_PIN_15;
     GPIO_Init(spi_pins);
 
-    free(spi_pins);
+
 
     /**
      * Setting up SPI2
@@ -47,7 +47,6 @@ int main(void)
     spi2->SPI_Config.CLK_Speed = SPI_SPEED_CLK_DIV2;
 
     SPI_Init(spi2);
-    free(spi2);
 
     /**
      * Sending data
@@ -59,6 +58,9 @@ int main(void)
     SPI_SendData(SPI2, (uint8_t*) data, len);
     while (!SPI_Control(SPI2, DISABLE));
     while(1);
+
+//    free(spi_pins);
+//    free(spi2);
 
 
 

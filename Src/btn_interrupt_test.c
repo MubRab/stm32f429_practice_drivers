@@ -23,7 +23,7 @@ int main(void)
     pGPIOHandleLED->pGPIOx_Pin_Config->pin_alt_func = 0x0;
 
     GPIO_Init(pGPIOHandleLED);
-    free(pGPIOHandleLED);
+
 
     GPIO_Handle_t *pGPIOHandleBtn = (GPIO_Handle_t*) malloc(sizeof(GPIO_Handle_t));
     pGPIOHandleBtn->pGPIOx = GPIOA;
@@ -35,11 +35,13 @@ int main(void)
     pGPIOHandleBtn->pGPIOx_Pin_Config->pin_alt_func = 0x0;
 
     GPIO_Init(pGPIOHandleBtn);
-    free(pGPIOHandleBtn);
+
 
     GPIO_IRQConfig(EXTI0_IRQ_NUM, 10, ENABLE);
 
     while (1);
+//    free(pGPIOHandleBtn);
+//    free(pGPIOHandleLED);
 
     return 0;
 }

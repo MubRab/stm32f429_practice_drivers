@@ -16,7 +16,6 @@ int main(void)
     pGPIOHandleLED->pGPIOx_Pin_Config->pin_alt_func = 0x0;
 
     GPIO_Init(pGPIOHandleLED);
-    free(pGPIOHandleLED);
 
     GPIO_Handle_t *pGPIOHandleBtn = (GPIO_Handle_t*) malloc(sizeof(GPIO_Handle_t));
     pGPIOHandleBtn->pGPIOx = GPIOA;
@@ -28,7 +27,7 @@ int main(void)
     pGPIOHandleBtn->pGPIOx_Pin_Config->pin_alt_func = 0x0;
 
     GPIO_Init(pGPIOHandleBtn);
-    free(pGPIOHandleBtn);
+
 
     while (1)
     {
@@ -37,8 +36,10 @@ int main(void)
             GPIO_TogglePin(GPIOG, GPIO_PIN_13);
             delay();/**Delay for software de-bouncing for button**/
         }
-//        delay();
     }
+
+//    free(pGPIOHandleLED);
+//    free(pGPIOHandleBtn);
 
     return 0;
 }
