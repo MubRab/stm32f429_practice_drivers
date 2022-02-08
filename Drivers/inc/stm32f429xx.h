@@ -59,6 +59,9 @@
  */
 #define SPI2_BASE_ADDR                          (APB1_BASE_ADDR + 0x3800U)
 #define SPI3_BASE_ADDR                          (APB1_BASE_ADDR + 0x3C00U)
+#define I2C1_BASE_ADDR                          (APB1_BASE_ADDR + 0x5400U)
+#define I2C2_BASE_ADDR                          (APB1_BASE_ADDR + 0x5800U)
+#define I2C3_BASE_ADDR                          (APB1_BASE_ADDR + 0x5C00U)
 
 /**
  * Selected macros for APB2 Bus peripherals
@@ -250,6 +253,28 @@ typedef struct
 #define EXTI                                    ((EXTI_Registers_t*) EXTI_BASE_ADDRESS)
 
 /**
+ * I2C registers struct
+ * Ch 27 - Register Map
+ */
+typedef struct
+{
+    volatile uint32_t CR1;
+    volatile uint32_t CR2;
+    volatile uint32_t OAR1;
+    volatile uint32_t OAR2;
+    volatile uint32_t DR;
+    volatile uint32_t SR1;
+    volatile uint32_t SR2;
+    volatile uint32_t CCR;
+    volatile uint32_t TRISE;
+    volatile uint32_t FLTR;
+} I2C_Registers_t;
+
+#define I2C1                                    ((I2C_Registers_t*) I2C1_BASE_ADDR)
+#define I2C2                                    ((I2C_Registers_t*) I2C2_BASE_ADDR)
+#define I2C3                                    ((I2C_Registers_t*) I2C3_BASE_ADDR)
+
+/**
  * SPI registers struct
  * Ch 28 - Register Map
  */
@@ -272,6 +297,7 @@ typedef struct
 #define SPI4                                    ((SPI_Registers_t*) SPI4_BASE_ADDR)
 #define SPI5                                    ((SPI_Registers_t*) SPI5_BASE_ADDR)
 #define SPI6                                    ((SPI_Registers_t*) SPI6_BASE_ADDR)
+
 /*********************************Function Macros******************************/
 /**
  * RCC function macros to enable clocks
@@ -295,6 +321,11 @@ typedef struct
 #define SPI4_CLK_EN()                           (RCC->APB2ENR |= (1<<13))
 #define SPI5_CLK_EN()                           (RCC->APB2ENR |= (1<<20))
 #define SPI6_CLK_EN()                           (RCC->APB2ENR |= (1<<21))
+
+/*I2C*/
+#define I2C1_CLK_EN()                           (RCC->APB1ENR |= (1<<21))
+#define I2C2_CLK_EN()                           (RCC->APB1ENR |= (1<<22))
+#define I2C3_CLK_EN()                           (RCC->APB1ENR |= (1<<23))
 
 #define SYSCFG_CLK_EN()                         (RCC->APB2ENR |= (1 << 14))
 /**
@@ -320,6 +351,11 @@ typedef struct
 #define SPI5_CLK_DI()                           (RCC->APB2ENR &= ~(1<<20))
 #define SPI6_CLK_DI()                           (RCC->APB2ENR &= ~(1<<21))
 
+/*I2C*/
+#define I2C1_CLK_DI()                           (RCC->APB1ENR &= ~(1<<21))
+#define I2C2_CLK_DI()                           (RCC->APB1ENR &= ~(1<<22))
+#define I2C3_CLK_DI()                           (RCC->APB1ENR &= ~(1<<23))
+
 #define SYSCFG_CLK_DI()                         (RCC->APB2ENR &= (1 << 14))
 /**
  * RCC function macros to reset peripherals
@@ -335,6 +371,19 @@ typedef struct
 #define GPIOI_RESET()							do{RCC->AHB1RSTR |= (1 << 8); RCC->AHB1RSTR &= ~(1 << 8);}while(0)
 #define GPIOJ_RESET()							do{RCC->AHB1RSTR |= (1 << 9); RCC->AHB1RSTR &= ~(1 << 9);}while(0)
 #define GPIOK_RESET()							do{RCC->AHB1RSTR |= (1 << 10); RCC->AHB1RSTR &= ~(1 << 10);}while(0)
+
+/*SPI*/
+#define SPI1_RESET()                            do{RCC->APB2RSTR |= (1 << 12); RCC->APB2RSTR &= ~(1 << 12);}while(0)
+#define SPI2_RESET()                            do{RCC->APB1RSTR |= (1 << 14); RCC->APB1RSTR &= ~(1 << 14);}while(0)
+#define SPI3_RESET()                            do{RCC->APB1RSTR |= (1 << 15); RCC->APB1RSTR &= ~(1 << 15);}while(0)
+#define SPI4_RESET()                            do{RCC->APB2RSTR |= (1 << 13); RCC->APB2RSTR &= ~(1 << 13);}while(0)
+#define SPI5_RESET()                            do{RCC->APB2RSTR |= (1 << 20); RCC->APB2RSTR &= ~(1 << 20);}while(0)
+#define SPI6_RESET()                            do{RCC->APB2RSTR |= (1 << 21); RCC->APB2RSTR &= ~(1 << 21);}while(0)
+
+/*I2C*/
+#define I2C1_RESET()                            do{RCC->APB1RSTR |= (1 << 21); RCC->AHB1RSTR &= ~(1 << 21);}while(0)
+#define I2C2_RESET()                            do{RCC->APB1RSTR |= (1 << 22); RCC->AHB1RSTR &= ~(1 << 22);}while(0)
+#define I2C3_RESET()                            do{RCC->APB1RSTR |= (1 << 23); RCC->AHB1RSTR &= ~(1 << 23);}while(0)
 
 #define SYSCFG_RESET()                          do{RCC->APB2RSTR |= (1 << 14); RCC->APB2RSTR &= ~(1 << 14);}while(0)
 

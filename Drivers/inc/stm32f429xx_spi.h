@@ -92,7 +92,6 @@ uint8_t SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxData, uint32_t size
 uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxData, uint32_t size);
 
 void SPI_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en);/****/
-//static void SPI_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);/****/
 void SPI_IRQHandler(SPI_Handle_t *pSPIHandle);/****/
 
 void SPI_ClearOVRFlag(SPI_Registers_t *pSPIx);
