@@ -262,6 +262,10 @@ void SPI_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en)
         {
             *NVIC_ISER1 |= (1 << (IRQNumber % 32));
         }
+        else if(IRQNumber >= 64 && IRQNumber < 96 )
+        {
+            *NVIC_ISER3 |= ( 1 << (IRQNumber % 64) );
+        }
         SPI_IRQPriorityConfig(IRQNumber, IRQPriority);
     }
     else
@@ -273,6 +277,10 @@ void SPI_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en)
         else if (IRQNumber >= 31 || IRQNumber <= 63)
         {
             *NVIC_ICER1 |= (1 << (IRQNumber % 32));
+        }
+        else if(IRQNumber >= 6 && IRQNumber < 96 )
+        {
+            *NVIC_ICER3 |= ( 1 << (IRQNumber % 64) );
         }
     }
 }
