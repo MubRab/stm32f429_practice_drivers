@@ -32,7 +32,15 @@
 #define I2C_EV_TX_COMPLETE                  0
 #define I2C_EV_RX_COMPLETE                  1
 #define I2C_EV_STOP                         2
+#define I2C_ER_BERR                         3
+#define I2C_ER_ARLO                         4
+#define I2C_ER_AF                           5
+#define I2C_ER_OVR                          6
+#define I2C_ER_TIMEOUT                      7
 
+/**
+ * Handle and config structs
+ */
 typedef struct
 {
     uint32_t SCLSpeed;
@@ -49,7 +57,7 @@ typedef struct
     uint8_t *pRxData;
     uint32_t TxSize;
     uint32_t RxSize;
-    uint8_t TxRxState;  /*Only one state, since I2C is half-duplex only*/
+    uint8_t TxRxState;  /*Only one state flag, since I2C is half-duplex only*/
     uint8_t SlaveAddress;
     uint32_t RxSize_;
     uint8_t RepeatedStart;

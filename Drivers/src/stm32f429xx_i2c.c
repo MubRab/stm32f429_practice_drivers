@@ -505,14 +505,48 @@ void I2C_EV_IRQHandler(I2C_Handle_t *pI2CHandle)
             --(pI2CHandle->TxSize);
             ++(pI2CHandle->pTxData);
         }
-//        I2C_ApplicationEventCallback(pI2CHandle, I2C_EV_TX_COMPLETE);
     }
 }
 
 /**
- * TODO
+ *
  */
 void I2C_ER_IRQHandler(I2C_Handle_t *pI2CHandle)
 {
+    /*Bus error*/
+    if ((pI2CHandle->pI2Cx->CR2 & (1 << 8)) && (pI2CHandle->pI2Cx->SR1 & (1 << 8)))
+    {
+        pI2CHandle->pI2Cx->SR1 &= ~(1 << 8);
+        I2C_ApplicationEventCallback(pI2CHandle, I2C_ER_BERR);
+    }
+
+    /*ARLO error*/
+    if ((pI2CHandle->pI2Cx->CR2 & (1 << 8)) && (pI2CHandle->pI2Cx->SR1 & (1 << 9)))
+    {
+        pI2CHandle->pI2Cx->SR1 &= ~(1 << 9);
+        I2C_ApplicationEventCallback(pI2CHandle, I2C_ER_ARLO);
+    }
+
+    /*ACK fail error*/
+    if ((pI2CHandle->pI2Cx->CR2 & (1 << 8)) && (pI2CHandle->pI2Cx->SR1 & (1 << 10)))
+    {
+        pI2CHandle->pI2Cx->SR1 &= ~(1 << 10);
+        I2C_ApplicationEventCallback(pI2CHandle, I2C_ER_AF);
+    }
+
+    /*OVR error*/
+    if ((pI2CHandle->pI2Cx->CR2 & (1 << 8)) && (pI2CHandle->pI2Cx->SR1 & (1 << 11)))
+    {
+        pI2CHandle->pI2Cx->SR1 &= ~(1 << 11);
+        I2C_ApplicationEventCallback(pI2CHandle, I2C_ER_OVR);
+    }
+
+    /*Time-out error*/
+    if ((pI2CHandle->pI2Cx->CR2 & (1 << 8)) && (pI2CHandle->pI2Cx->SR1 & (1 << 14)))
+    {
+        pI2CHandle->pI2Cx->SR1 &= ~(1 << 14);
+        I2C_ApplicationEventCallback(pI2CHandle, I2C_ER_TIMEOUT);
+    }
+
 
 }
