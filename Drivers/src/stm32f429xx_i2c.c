@@ -383,6 +383,19 @@ void I2C_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en)
     }
 }
 
+/*
+ * slave only sends one byte at a time
+ */
+void I2C_SlaveSendData(I2C_Registers_t *pI2Cx, uint8_t pData)
+{
+    pI2Cx->DR = pData;
+}
+
+uint8_t I2C_SlaveReceiveData(I2C_Registers_t *pI2Cx)
+{
+    return (uint8_t) pI2Cx->DR;
+}
+
 static void I2C_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
 {
     uint8_t iprx = IRQNumber / 4;
@@ -454,56 +467,76 @@ void I2C_EV_IRQHandler(I2C_Handle_t *pI2CHandle)
         I2C_ApplicationEventCallback(pI2CHandle, I2C_EV_STOP);
     }
 
-    if ((pI2CHandle->pI2Cx->CR2 & (1 << 9)) && (pI2CHandle->pI2Cx->CR2 & (1 << 10)) && (pI2CHandle->pI2Cx->SR1 & (1 << 6)) && (pI2CHandle->pI2Cx->SR2 & (1 << 0))) /*RxNE event*/
+    if ((pI2CHandle->pI2Cx->CR2 & (1 << 9)) && (pI2CHandle->pI2Cx->CR2 & (1 << 10)) && (pI2CHandle->pI2Cx->SR1 & (1 << 6))) /*RxNE event*/
     {
-        if (pI2CHandle->TxRxState == I2C_STATE_BUSY_RX)
+        if ((pI2CHandle->pI2Cx->SR2 & (1 << 0)))
         {
-            if (pI2CHandle->RxSize == 1)
+            if (pI2CHandle->TxRxState == I2C_STATE_BUSY_RX)
             {
-                *pI2CHandle->pRxData = pI2CHandle->pI2Cx->DR;
-                --(pI2CHandle->RxSize);
+                if (pI2CHandle->RxSize == 1)
+                {
+                    *pI2CHandle->pRxData = pI2CHandle->pI2Cx->DR;
+                    --(pI2CHandle->RxSize);
 
-            }
-            else if (pI2CHandle->RxSize > 1)
-            {
-                /*check if last 2 bytes remaining*/
-                if (pI2CHandle->RxSize == 2)
-                {
-                    I2C_ACKControl(pI2CHandle->pI2Cx, DISABLE);
                 }
+                else if (pI2CHandle->RxSize > 1)
+                {
+                    /*check if last 2 bytes remaining*/
+                    if (pI2CHandle->RxSize == 2)
+                    {
+                        I2C_ACKControl(pI2CHandle->pI2Cx, DISABLE);
+                    }
 
-                *pI2CHandle->pRxData = pI2CHandle->pI2Cx->DR;
-                --(pI2CHandle->RxSize);
-                ++(pI2CHandle->pRxData);
+                    *pI2CHandle->pRxData = pI2CHandle->pI2Cx->DR;
+                    --(pI2CHandle->RxSize);
+                    ++(pI2CHandle->pRxData);
+                }
+                else if (pI2CHandle->RxSize == 0)
+                {
+                    if (pI2CHandle->RepeatedStart == DISABLE)
+                    {
+                        pI2CHandle->pI2Cx->CR1 |= (1 << 9);
+                    }
+                    pI2CHandle->pI2Cx->CR2 &= ~(1 << 9);
+                    pI2CHandle->pI2Cx->CR2 &= ~(1 << 10);
+                    pI2CHandle->pRxData = NULL;
+                    pI2CHandle->RxSize = 0;
+                    pI2CHandle->RxSize_ = 0;
+                    pI2CHandle->TxRxState = I2C_STATE_READY;
+                    if (pI2CHandle->I2CConfig.ACKControl == I2C_ACK_EN)
+                    {
+                        I2C_ACKControl(pI2CHandle->pI2Cx, ENABLE);
+                    }
+                    I2C_ApplicationEventCallback(pI2CHandle, I2C_EV_RX_COMPLETE);
+                }
             }
-            else if (pI2CHandle->RxSize == 0)
+        }
+        else
+        {
+            if (!(pI2CHandle->pI2Cx->SR2 & (1 << 3))) /*receiver mode*/
             {
-                if (pI2CHandle->RepeatedStart == DISABLE)
-                {
-                    pI2CHandle->pI2Cx->CR1 |= (1 << 9);
-                }
-                pI2CHandle->pI2Cx->CR2 &= ~(1 << 9);
-                pI2CHandle->pI2Cx->CR2 &= ~(1 << 10);
-                pI2CHandle->pRxData = NULL;
-                pI2CHandle->RxSize = 0;
-                pI2CHandle->RxSize_ = 0;
-                pI2CHandle->TxRxState = I2C_STATE_READY;
-                if (pI2CHandle->I2CConfig.ACKControl == I2C_ACK_EN)
-                {
-                    I2C_ACKControl(pI2CHandle->pI2Cx, ENABLE);
-                }
-                I2C_ApplicationEventCallback(pI2CHandle, I2C_EV_RX_COMPLETE);
+                I2C_ApplicationEventCallback(pI2CHandle, I2C_EV_DATA_REC);
             }
         }
     }
 
-    if ((pI2CHandle->pI2Cx->CR2 & (1 << 9)) && (pI2CHandle->pI2Cx->CR2 & (1 << 10)) && (pI2CHandle->pI2Cx->SR1 & (1 << 7)) && (pI2CHandle->pI2Cx->SR2 & (1 << 0))) /*TxE event*/
+    if ((pI2CHandle->pI2Cx->CR2 & (1 << 9)) && (pI2CHandle->pI2Cx->CR2 & (1 << 10)) && (pI2CHandle->pI2Cx->SR1 & (1 << 7))) /*TxE event*/
     {
-        if ((pI2CHandle->TxRxState == I2C_STATE_BUSY_TX) && (pI2CHandle->TxSize > 0))
+        if (pI2CHandle->pI2Cx->SR2 & (1 << 0))/*master*/
         {
-            pI2CHandle->pI2Cx->DR = *pI2CHandle->pTxData;
-            --(pI2CHandle->TxSize);
-            ++(pI2CHandle->pTxData);
+            if ((pI2CHandle->TxRxState == I2C_STATE_BUSY_TX) && (pI2CHandle->TxSize > 0))
+            {
+                pI2CHandle->pI2Cx->DR = *pI2CHandle->pTxData;
+                --(pI2CHandle->TxSize);
+                ++(pI2CHandle->pTxData);
+            }
+        }
+        else /*slave*/
+        {
+            if (pI2CHandle->pI2Cx->SR2 & (1 << 3)) /*transmitter mode*/
+            {
+                I2C_ApplicationEventCallback(pI2CHandle, I2C_EV_DATA_REQ);
+            }
         }
     }
 }

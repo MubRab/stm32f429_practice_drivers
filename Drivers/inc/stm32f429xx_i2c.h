@@ -37,6 +37,8 @@
 #define I2C_ER_AF                           5
 #define I2C_ER_OVR                          6
 #define I2C_ER_TIMEOUT                      7
+#define I2C_EV_DATA_REQ                     8
+#define I2C_EV_DATA_REC                     9
 
 /**
  * Handle and config structs
@@ -76,6 +78,9 @@ void I2C_MasterSendData(I2C_Handle_t *pI2CHandle, uint8_t *pData, uint32_t size,
 void I2C_MasterReceiveData(I2C_Handle_t *pI2CHandle, uint8_t *pData, uint32_t size, uint8_t slaveAddr, uint8_t repeatedStart);
 uint8_t I2C_MasterSendDataIT(I2C_Handle_t *pI2CHandle, uint8_t *pData, uint32_t size, uint8_t slaveAddr, uint8_t repeatedStart);
 uint8_t I2C_MasterReceiveDataIT(I2C_Handle_t *pI2CHandle, uint8_t *pData, uint32_t size, uint8_t slaveAddr, uint8_t repeatedStart);
+
+void I2C_SlaveSendData(I2C_Registers_t *pI2Cx, uint8_t pData);
+uint8_t I2C_SlaveReceiveData(I2C_Registers_t *pI2Cx);
 
 void I2C_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en);/****/
 void I2C_EV_IRQHandler(I2C_Handle_t *pI2CHandle);
