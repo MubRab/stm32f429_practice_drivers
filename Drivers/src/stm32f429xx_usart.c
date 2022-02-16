@@ -189,12 +189,110 @@ uint8_t USART_Control(USART_Registers_t *pUSART, uint8_t EN)
 
 void USART_SendData(USART_Registers_t *pUSARTx,uint8_t *pTxData, uint32_t size)
 {
+    for (uint32_t i = 0; i < size; ++i)
+    {
+        while (!(pUSARTx->SR & (1 << 7)));
 
+        if (pUSARTx->CR1 & (1 << 12))
+        {
+            /*9-bits*/
+            pUSARTx->DR = (*((uint16_t*)pTxData) & 0x01FF); /*Only use the first 9-bits, mask the rest*/
+
+            if (pUSARTx->CR1 & (1 << 10))
+            {
+                /*parity enabled*/
+                ++pTxData;
+            }
+            else
+            {
+                pTxData += 2;
+            }
+        }
+        else
+        {
+            /*8-bits*/
+            pUSARTx->DR = (*(pTxData) & 0xFF);
+            ++pTxData;
+        }
+    }
+
+    while (!(pUSARTx->SR & (1 << 6)));
 }
 
-void USART_ReceiveData(USART_Registers_t *pUSARTx, uint8_t *pRxData, uint32_t size);
-uint8_t USART_SendDataIT(USART_Handle_t *pUSARTHandle,uint8_t *pTxData, uint32_t size);
-uint8_t USART_ReceiveDataIT(USART_Handle_t *pUSARTHandle, uint8_t *pRxData, uint32_t size);
+void USART_ReceiveData(USART_Registers_t *pUSARTx, uint8_t *pRxData, uint32_t size)
+{
+    for (uint32_t i = 0; i < size; ++i)
+    {
+        while (!(pUSARTx->SR & (1 << 5)));
+
+        if (pUSARTx->CR1 & (1 << 12))
+        {
+            /*9-bits*/
+
+            if (pUSARTx->CR1 & (1 << 10))
+            {
+                /*parity enabled*/
+                *pRxData = (uint8_t)(pUSARTx->DR & 0xFF);
+                ++pRxData;
+            }
+            else
+            {
+                *((uint16_t*)pRxData) = (uint16_t)(pUSARTx->DR & 0x01FF);
+                pRxData += 2;
+            }
+        }
+        else
+        {
+            /*8-bits*/
+
+            if (pUSARTx->CR1 & (1 << 10))
+            {
+                /*parity enabled*/
+                *pRxData = (uint8_t)(pUSARTx->DR & 0x7F);
+
+            }
+            else
+            {
+                *pRxData = (uint8_t)pUSARTx->DR;
+            }
+
+            ++pRxData;
+        }
+    }
+}
+
+uint8_t USART_SendDataIT(USART_Handle_t *pUSARTHandle,uint8_t *pTxData, uint32_t size)
+{
+    uint8_t state = pUSARTHandle->TxState;
+
+    if (state != USART_STATE_BUSY_TX)
+    {
+        pUSARTHandle->TxSize = size;
+        pUSARTHandle->pTxData = pTxData;
+        pUSARTHandle->TxState = USART_STATE_BUSY_TX;
+
+        pUSARTHandle->pUSARTx->CR1 |= (1 << 7);
+        pUSARTHandle->pUSARTx->CR1 |= (1 << 6);
+    }
+
+    return state;
+}
+
+uint8_t USART_ReceiveDataIT(USART_Handle_t *pUSARTHandle, uint8_t *pRxData, uint32_t size)
+{
+    uint8_t state = pUSARTHandle->RxState;
+
+    if (state != USART_STATE_BUSY_RX)
+    {
+        pUSARTHandle->RxSize = size;
+        pUSARTHandle->pRxData = pRxData;
+        pUSARTHandle->RxState = USART_STATE_BUSY_RX;
+
+        pUSARTHandle->pUSARTx->CR1 |= (1 << 5);
+    }
+
+    return state;
+}
 
 void USART_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t en)
 {

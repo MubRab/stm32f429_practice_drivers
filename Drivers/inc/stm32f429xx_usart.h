@@ -45,6 +45,10 @@
 #define USART_HW_FLOW_CTRL_RTS              2
 #define USART_HW_FLOW_CTRL_CTS_RTS          3
 
+#define USART_STATE_READY                   0
+#define USART_STATE_BUSY_RX                 1
+#define USART_STATE_BUSY_TX                 2
+
 typedef struct
 {
     uint8_t Mode;
@@ -59,6 +63,13 @@ typedef struct
 {
     USART_Registers_t *pUSARTx;
     USART_Config_t USARTConfig;
+
+    uint8_t *pTxData;
+    uint8_t *pRxData;
+    uint32_t TxSize;
+    uint32_t RxSize;
+    uint8_t TxState;
+    uint8_t RxState;
 
 } USART_Handle_t;
 
