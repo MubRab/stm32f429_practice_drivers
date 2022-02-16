@@ -61,6 +61,12 @@
  */
 #define SPI2_BASE_ADDR                          (APB1_BASE_ADDR + 0x3800U)
 #define SPI3_BASE_ADDR                          (APB1_BASE_ADDR + 0x3C00U)
+#define USART2_BASE_ADDR                        (APB1_BASE_ADDR + 0x4400U)
+#define USART3_BASE_ADDR                        (APB1_BASE_ADDR + 0x4800U)
+#define UART4_BASE_ADDR                         (APB1_BASE_ADDR + 0x4C00U)
+#define UART5_BASE_ADDR                         (APB1_BASE_ADDR + 0x5000U)
+#define UART7_BASE_ADDR                         (APB1_BASE_ADDR + 0x7800U)
+#define UART8_BASE_ADDR                         (APB1_BASE_ADDR + 0x7C00U)
 #define I2C1_BASE_ADDR                          (APB1_BASE_ADDR + 0x5400U)
 #define I2C2_BASE_ADDR                          (APB1_BASE_ADDR + 0x5800U)
 #define I2C3_BASE_ADDR                          (APB1_BASE_ADDR + 0x5C00U)
@@ -69,6 +75,8 @@
  * Selected macros for APB2 Bus peripherals
  * obtained from Datasheet Ch 5 table 13
  */
+#define USART1_BASE_ADDR                        (APB2_BASE_ADDR + 0x1000U)
+#define USART6_BASE_ADDR                        (APB2_BASE_ADDR + 0x1400U)
 #define SPI1_BASE_ADDR                          (APB2_BASE_ADDR + 0x3000U)
 #define SPI4_BASE_ADDR                          (APB2_BASE_ADDR + 0x3400U)
 #define SYSCFG_BASE_ADDRESS						(APB2_BASE_ADDR + 0x3800U)
@@ -308,6 +316,30 @@ typedef struct
 #define SPI5                                    ((SPI_Registers_t*) SPI5_BASE_ADDR)
 #define SPI6                                    ((SPI_Registers_t*) SPI6_BASE_ADDR)
 
+/**
+ * USART registers struct
+ * see ch 30.6 in reference manual
+ */
+typedef struct
+{
+    volatile uint32_t SR;
+    volatile uint32_t DR;
+    volatile uint32_t BRR;
+    volatile uint32_t CR1;
+    volatile uint32_t CR2;
+    volatile uint32_t CR3;
+    volatile uint32_t GTPR;
+} USART_Registers_t;
+
+#define USART1                                  ((USART_Registers_t*) USART1_BASE_ADDR)
+#define USART2                                  ((USART_Registers_t*) USART2_BASE_ADDR)
+#define USART3                                  ((USART_Registers_t*) USART3_BASE_ADDR)
+#define UART4                                   ((USART_Registers_t*) UART4_BASE_ADDR)
+#define UART5                                   ((USART_Registers_t*) UART5_BASE_ADDR)
+#define USART6                                  ((USART_Registers_t*) USART6_BASE_ADDR)
+#define UART7                                   ((USART_Registers_t*) UART7_BASE_ADDR)
+#define UART8                                   ((USART_Registers_t*) UART8_BASE_ADDR)
+
 /*********************************Function Macros******************************/
 /**
  * RCC function macros to enable clocks
@@ -336,6 +368,16 @@ typedef struct
 #define I2C1_CLK_EN()                           (RCC->APB1ENR |= (1<<21))
 #define I2C2_CLK_EN()                           (RCC->APB1ENR |= (1<<22))
 #define I2C3_CLK_EN()                           (RCC->APB1ENR |= (1<<23))
+
+/*USART*/
+#define USART1_CLK_EN()                         (RCC->APB2ENR |= (1 << 4))
+#define USART2_CLK_EN()                         (RCC->APB1ENR |= (1 << 17))
+#define USART3_CLK_EN()                         (RCC->APB1ENR |= (1 << 18))
+#define UART4_CLK_EN()                          (RCC->APB1ENR |= (1 << 19))
+#define UART5_CLK_EN()                          (RCC->APB1ENR |= (1 << 20))
+#define USART6_CLK_EN()                         (RCC->APB2ENR |= (1 << 5))
+#define UART7_CLK_EN()                          (RCC->APB1ENR |= (1 << 30))
+#define UART8_CLK_EN()                          (RCC->APB1ENR |= (1 << 31))
 
 #define SYSCFG_CLK_EN()                         (RCC->APB2ENR |= (1 << 14))
 /**
@@ -366,6 +408,16 @@ typedef struct
 #define I2C2_CLK_DI()                           (RCC->APB1ENR &= ~(1<<22))
 #define I2C3_CLK_DI()                           (RCC->APB1ENR &= ~(1<<23))
 
+/*USART*/
+#define USART1_CLK_DI()                         (RCC->APB2ENR &= ~(1 << 4))
+#define USART2_CLK_DI()                         (RCC->APB1ENR &= ~(1 << 17))
+#define USART3_CLK_DI()                         (RCC->APB1ENR &= ~(1 << 18))
+#define UART4_CLK_DI()                          (RCC->APB1ENR &= ~(1 << 19))
+#define UART5_CLK_DI()                          (RCC->APB1ENR &= ~(1 << 20))
+#define USART6_CLK_DI()                         (RCC->APB2ENR &= ~(1 << 5))
+#define UART7_CLK_DI()                          (RCC->APB1ENR &= ~(1 << 30))
+#define UART8_CLK_DI()                          (RCC->APB1ENR &= ~(1 << 31))
+
 #define SYSCFG_CLK_DI()                         (RCC->APB2ENR &= (1 << 14))
 /**
  * RCC function macros to reset peripherals
@@ -391,9 +443,20 @@ typedef struct
 #define SPI6_RESET()                            do{RCC->APB2RSTR |= (1 << 21); RCC->APB2RSTR &= ~(1 << 21);}while(0)
 
 /*I2C*/
-#define I2C1_RESET()                            do{RCC->APB1RSTR |= (1 << 21); RCC->AHB1RSTR &= ~(1 << 21);}while(0)
-#define I2C2_RESET()                            do{RCC->APB1RSTR |= (1 << 22); RCC->AHB1RSTR &= ~(1 << 22);}while(0)
-#define I2C3_RESET()                            do{RCC->APB1RSTR |= (1 << 23); RCC->AHB1RSTR &= ~(1 << 23);}while(0)
+#define I2C1_RESET()                            do{RCC->APB1RSTR |= (1 << 21); RCC->APB1RSTR &= ~(1 << 21);}while(0)
+#define I2C2_RESET()                            do{RCC->APB1RSTR |= (1 << 22); RCC->APB1RSTR &= ~(1 << 22);}while(0)
+#define I2C3_RESET()                            do{RCC->APB1RSTR |= (1 << 23); RCC->APB1RSTR &= ~(1 << 23);}while(0)
+
+/*USART*/
+#define USART1_RESET()                          do{RCC->APB2RSTR |= (1 << 4); RCC->APB2RSTR &= ~(1 << 4);}while(0)
+#define USART2_RESET()                          do{RCC->APB1RSTR |= (1 << 17); RCC->APB1RSTR &= ~(1 << 17);}while(0)
+#define USART3_RESET()                          do{RCC->APB1RSTR |= (1 << 18); RCC->APB1RSTR &= ~(1 << 18);}while(0)
+#define UART4_RESET()                           do{RCC->APB1RSTR |= (1 << 19); RCC->APB1RSTR &= ~(1 << 19);}while(0)
+#define UART5_RESET()                           do{RCC->APB1RSTR |= (1 << 20); RCC->APB1RSTR &= ~(1 << 20);}while(0)
+#define USART6_RESET()                          do{RCC->APB2RSTR |= (1 << 5); RCC->APB2RSTR &= ~(1 << 5);}while(0)
+#define UART7_RESET()                           do{RCC->APB1RSTR |= (1 << 30); RCC->APB1RSTR &= ~(1 << 30);}while(0)
+#define UART8_RESET()                           do{RCC->APB1RSTR |= (1 << 31); RCC->APB1RSTR &= ~(1 << 31);}while(0)
+
 
 #define SYSCFG_RESET()                          do{RCC->APB2RSTR |= (1 << 14); RCC->APB2RSTR &= ~(1 << 14);}while(0)
 
