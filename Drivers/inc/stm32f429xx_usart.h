@@ -49,6 +49,9 @@
 #define USART_STATE_BUSY_RX                 1
 #define USART_STATE_BUSY_TX                 2
 
+#define USART_OVER_16                        0
+#define USART_OVER_8                        1
+
 typedef struct
 {
     uint8_t Mode;
@@ -57,6 +60,7 @@ typedef struct
     uint8_t WordLength;
     uint8_t ParityBit;
     uint8_t HWFlowCtrl;
+    uint8_t OversamplingMode;
 } USART_Config_t;
 
 typedef struct

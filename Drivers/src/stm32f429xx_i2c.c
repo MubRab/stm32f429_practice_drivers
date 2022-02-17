@@ -5,46 +5,10 @@
  *      Author:
  */
 #include "stm32f429xx_i2c.h"
+#include "stm32f429xx_rcc.h"
 
 static void I2C_Clk(I2C_Registers_t *pI2Cx, uint8_t en);
 static void I2C_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
-
-static uint32_t GetPCLK1(void)
-{
-    uint8_t clk_type = ((RCC->CFGR >> 2) & 0x3);
-    uint32_t clk_speed = 16000000;/*default value*/
-
-    /*Identifying clk source*/
-    if (clk_type == 0)
-    {
-        clk_speed = 16000000;
-    }
-    else if (clk_type == 1)
-    {
-        clk_speed = 8000000;
-    }
-    else
-    {
-        /*PLLCLK source. Not needed*/
-    }
-
-    /*Pre-scaler*/
-    uint16_t prescaler[8] = {2, 4, 8, 16, 64, 128, 256, 512};
-    uint8_t idx = ((RCC->CFGR >> 4) & 0xF);
-    if (idx >= 8)
-    {
-        clk_speed /= prescaler[idx-8];
-    }
-
-    uint16_t apb1_prescaler[4] = {2, 4, 8, 16};
-    idx = ((RCC->CFGR >> 4) & 0x7);
-    if (idx >= 4)
-    {
-        clk_speed /= apb1_prescaler[idx-4];
-    }
-
-    return clk_speed;
-}
 
 void I2C_Init(I2C_Handle_t *pI2CHandle)
 {
@@ -52,7 +16,7 @@ void I2C_Init(I2C_Handle_t *pI2CHandle)
 
 //    pI2CHandle->pI2Cx->CR1 |= (pI2CHandle->I2CConfig.ACKControl << 10);
 
-    uint8_t clk_speed = (uint8_t) GetPCLK1();
+    uint8_t clk_speed = (uint8_t) GetPCLKAPB1();
     pI2CHandle->pI2Cx->CR2 |= (clk_speed/1000000U);
 
     pI2CHandle->pI2Cx->OAR1 |= (pI2CHandle->I2CConfig.DeviceAddress << 1);

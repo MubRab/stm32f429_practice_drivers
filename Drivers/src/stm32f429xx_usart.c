@@ -5,6 +5,7 @@
  *      Author:
  */
 #include "stm32f429xx_usart.h"
+#include "stm32f429xx_rcc.h"
 
 static void USART_Clk(USART_Registers_t *pUSARTx, uint8_t en);
 static void USART_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority);
@@ -27,7 +28,32 @@ void USART_Init(USART_Handle_t *pUSARTHandle)
         pUSARTHandle->pUSARTx->CR1 |= (1 << 3);
     }
 
-    /*TODO: BAUD*/
+    uint32_t usart_div;
+    if (pUSARTHandle->pUSARTx == USART1 || pUSARTHandle->pUSARTx == USART6)
+    {
+    usart_div = (uint32_t) ((GetPCLKAPB1() /
+            (8 * (2 - pUSARTHandle->USARTConfig.OversamplingMode) * pUSARTHandle->USARTConfig.BaudRate)) * 100);
+    }
+    else
+    {
+        usart_div = (uint32_t) ((GetPCLKAPB2() /
+                    (8 * (2 - pUSARTHandle->USARTConfig.OversamplingMode) * pUSARTHandle->USARTConfig.BaudRate)) * 100);
+    }
+
+    uint16_t div_mantissa = (uint16_t) (usart_div/100);
+    uint8_t div_fraction = (uint8_t) (((usart_div - (div_mantissa * 100) * (8 * (2 - pUSARTHandle->USARTConfig.OversamplingMode))) + 50)/100);
+
+    if (pUSARTHandle->USARTConfig.OversamplingMode == USART_OVER_8)
+    {
+        pUSARTHandle->pUSARTx->CR1 |= (1 << 15);
+        div_fraction = (uint8_t) (div_fraction & (0x7));
+    }
+    else
+    {
+        div_fraction = (uint8_t) (div_fraction & (0xF));
+    }
+
+    pUSARTHandle->pUSARTx->BRR |= ((div_mantissa << 4) | (div_fraction));
 
     pUSARTHandle->pUSARTx->CR2 |= (pUSARTHandle->USARTConfig.StopBits << 12);
 
