@@ -368,7 +368,7 @@ static void USART_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
 }
 
 /*
- * TODO
+ *
  */
 void USART_IRQHandler(USART_Handle_t *pUSARTHandle)
 {
@@ -391,15 +391,15 @@ void USART_IRQHandler(USART_Handle_t *pUSARTHandle)
     {
         if (pUSARTHandle->TxState == USART_STATE_BUSY_TX && pUSARTHandle->TxSize > 0)
         {
-            if (pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_9BITS &&
-                    pUSARTHandle->USARTConfig->ParityBit == USART_PARITY_DISABLE)
+            if (pUSARTHandle->USARTConfig.WordLength == USART_WORDLENGTH_9BITS &&
+                    pUSARTHandle->USARTConfig.ParityBit == USART_PARITY_DISABLE)
             {
                 pUSARTHandle->pUSARTx->DR = (uint16_t)((*(uint16_t*)pUSARTHandle->pTxData) & 0x01FF);
                 (pUSARTHandle->pTxData) += 2;
                 (pUSARTHandle->TxSize) -= 2;
             }
-            else if (pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_9BITS &&
-                        pUSARTHandle->USARTConfig->ParityBit != USART_PARITY_DISABLE)
+            else if (pUSARTHandle->USARTConfig.WordLength == USART_WORDLENGTH_9BITS &&
+                        pUSARTHandle->USARTConfig.ParityBit != USART_PARITY_DISABLE)
             {
                 pUSARTHandle->pUSARTx->DR = (uint16_t)((*(uint16_t*)pUSARTHandle->pTxData) & 0x01FF);
                 ++(pUSARTHandle->pTxData);
@@ -424,17 +424,17 @@ void USART_IRQHandler(USART_Handle_t *pUSARTHandle)
     {
         if (pUSARTHandle->RxState == USART_STATE_BUSY_RX && pUSARTHandle->RxSize > 0)
         {
-            if (pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_9BITS &&
-                    pUSARTHandle->USARTConfig->ParityBit == USART_PARITY_DISABLE)
+            if (pUSARTHandle->USARTConfig.WordLength == USART_WORDLENGTH_9BITS &&
+                    pUSARTHandle->USARTConfig.ParityBit == USART_PARITY_DISABLE)
             {
                 *((uint16_t*)pUSARTHandle->pRxData) = (uint16_t)(pUSARTHandle->pUSARTx->DR & 0x01FF);
                 (pUSARTHandle->pRxData) += 2;
                 (pUSARTHandle->RxSize) -= 2;
             }
-            else if ((pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_9BITS &&
-                        pUSARTHandle->USARTConfig->ParityBit != USART_PARITY_DISABLE) ||
-                    (pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_8BITS &&
-                        pUSARTHandle->USARTConfig->ParityBit == USART_PARITY_DISABLE))
+            else if ((pUSARTHandle->USARTConfig.WordLength == USART_WORDLENGTH_9BITS &&
+                        pUSARTHandle->USARTConfig.ParityBit != USART_PARITY_DISABLE) ||
+                    (pUSARTHandle->USARTConfig.WordLength == USART_WORDLENGTH_8BITS &&
+                        pUSARTHandle->USARTConfig.ParityBit == USART_PARITY_DISABLE))
             {
                 *(pUSARTHandle->pRxData) = (uint8_t)(pUSARTHandle->pUSARTx->DR & 0xFF);
                 ++(pUSARTHandle->pRxData);
@@ -454,4 +454,29 @@ void USART_IRQHandler(USART_Handle_t *pUSARTHandle)
             USART_ApplicationEventCallback(pUSARTHandle, USART_EV_RX_COMPLETE);
         }
     }
+
+    /*CTS Flag*/
+    if ((pUSARTHandle->pUSARTx->SR & (1 << 9)) && (pUSARTHandle->pUSARTx->CR3 & (1 << 9)) && (pUSARTHandle->pUSARTx->CR3 & (1 << 10)))
+    {
+        pUSARTHandle->pUSARTx->SR &= ~(1 << 9);
+        USART_ApplicationEventCallback(pUSARTHandle, USART_EV_CTS);
+    }
+
+    /*IDLE Flag*/
+    if ((pUSARTHandle->pUSARTx->SR & (1 << 4)) && (pUSARTHandle->pUSARTx->CR1 & (1 << 4)))
+    {
+        uint8_t tempRead = pUSARTHandle->pUSARTx->DR;
+        (void)tempRead;
+        USART_ApplicationEventCallback(pUSARTHandle, USART_EV_IDLE);
+    }
+
+    /*ORE Flag*/
+    if ((pUSARTHandle->pUSARTx->SR & (1 << 3)) && (pUSARTHandle->pUSARTx->CR1 & (1 << 5)))
+    {
+        uint8_t tempRead = pUSARTHandle->pUSARTx->DR;
+        (void)tempRead;
+        USART_ApplicationEventCallback(pUSARTHandle, USART_EV_ORE);
+    }
+
+    /*other error flags not added, since we are not working with multi-buffer communication*/
 }

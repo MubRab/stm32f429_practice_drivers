@@ -49,8 +49,14 @@
 #define USART_STATE_BUSY_RX                 1
 #define USART_STATE_BUSY_TX                 2
 
-#define USART_OVER_16                        0
+#define USART_OVER_16                       0
 #define USART_OVER_8                        1
+
+#define USART_EV_TX_COMPLETE                0
+#define USART_EV_RX_COMPLETE                1
+#define USART_EV_CTS                        2
+#define USART_EV_IDLE                       3
+#define USART_EV_ORE                        4
 
 typedef struct
 {
