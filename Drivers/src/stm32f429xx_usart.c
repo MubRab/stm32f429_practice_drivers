@@ -367,4 +367,91 @@ static void USART_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
     *(NVIC_IPR_BASE_ADDR + iprx) |= IRQPriority << (prix + (8 - NUM_PR_BITS_IMPLEMENTED));
 }
 
+/*
+ * TODO
+ */
+void USART_IRQHandler(USART_Handle_t *pUSARTHandle)
+{
+    /*Transmission complete*/
+    if ((pUSARTHandle->pUSARTx->SR & (1 << 6)) && (pUSARTHandle->pUSARTx->CR1 & (1 << 6)))
+    {
+        if (pUSARTHandle->TxState == USART_STATE_BUSY_TX && pUSARTHandle->TxSize == 0)
+        {
+            pUSARTHandle->pUSARTx->SR &= ~(1 << 6);
+            pUSARTHandle->pUSARTx->CR1 &= ~(1 << 6);
+            pUSARTHandle->TxState = USART_STATE_READY;
+            pUSARTHandle->pTxData = NULL;
+            pUSARTHandle->TxSize = 0;
+            USART_ApplicationEventCallback(pUSARTHandle, USART_EV_TX_COMPLETE);
+        }
+    }
 
+    /*TXE Flag*/
+    if ((pUSARTHandle->pUSARTx->SR & (1 << 7)) && (pUSARTHandle->pUSARTx->CR1 & (1 << 7)))
+    {
+        if (pUSARTHandle->TxState == USART_STATE_BUSY_TX && pUSARTHandle->TxSize > 0)
+        {
+            if (pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_9BITS &&
+                    pUSARTHandle->USARTConfig->ParityBit == USART_PARITY_DISABLE)
+            {
+                pUSARTHandle->pUSARTx->DR = (uint16_t)((*(uint16_t*)pUSARTHandle->pTxData) & 0x01FF);
+                (pUSARTHandle->pTxData) += 2;
+                (pUSARTHandle->TxSize) -= 2;
+            }
+            else if (pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_9BITS &&
+                        pUSARTHandle->USARTConfig->ParityBit != USART_PARITY_DISABLE)
+            {
+                pUSARTHandle->pUSARTx->DR = (uint16_t)((*(uint16_t*)pUSARTHandle->pTxData) & 0x01FF);
+                ++(pUSARTHandle->pTxData);
+                --(pUSARTHandle->TxSize);
+            }
+            else /*Wordlength = 8-bit*/
+            {
+                pUSARTHandle->pUSARTx->DR = (uint8_t)((*(uint8_t*)pUSARTHandle->pTxData) & 0xFF);
+                ++(pUSARTHandle->pTxData);
+                --(pUSARTHandle->TxSize);
+            }
+        }
+        else if (pUSARTHandle->TxState == USART_STATE_BUSY_TX && pUSARTHandle->TxSize == 0)
+        {
+            pUSARTHandle->pUSARTx->CR1 &= ~(1 << 7);
+            /*the rest is handled by the TC handler*/
+        }
+    }
+
+    /*RXNE Flag*/
+    if ((pUSARTHandle->pUSARTx->SR & (1 << 5)) && (pUSARTHandle->pUSARTx->CR1 & (1 << 5)))
+    {
+        if (pUSARTHandle->RxState == USART_STATE_BUSY_RX && pUSARTHandle->RxSize > 0)
+        {
+            if (pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_9BITS &&
+                    pUSARTHandle->USARTConfig->ParityBit == USART_PARITY_DISABLE)
+            {
+                *((uint16_t*)pUSARTHandle->pRxData) = (uint16_t)(pUSARTHandle->pUSARTx->DR & 0x01FF);
+                (pUSARTHandle->pRxData) += 2;
+                (pUSARTHandle->RxSize) -= 2;
+            }
+            else if ((pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_9BITS &&
+                        pUSARTHandle->USARTConfig->ParityBit != USART_PARITY_DISABLE) ||
+                    (pUSARTHandle->USARTConfig->WordLength == USART_WORDLENGTH_8BITS &&
+                        pUSARTHandle->USARTConfig->ParityBit == USART_PARITY_DISABLE))
+            {
+                *(pUSARTHandle->pRxData) = (uint8_t)(pUSARTHandle->pUSARTx->DR & 0xFF);
+                ++(pUSARTHandle->pRxData);
+                --(pUSARTHandle->RxSize);
+            }
+            else
+            {
+                *(pUSARTHandle->pRxData) = (uint8_t)(pUSARTHandle->pUSARTx->DR & 0x7F);
+                ++(pUSARTHandle->pRxData);
+                --(pUSARTHandle->RxSize);
+            }
+        }
+        else if (pUSARTHandle->RxState == USART_STATE_BUSY_RX && pUSARTHandle->RxSize == 0)
+        {
+            pUSARTHandle->pUSARTx->CR1 &= ~(1 << 5);
+            pUSARTHandle->RxState = USART_STATE_READY;
+            USART_ApplicationEventCallback(pUSARTHandle, USART_EV_RX_COMPLETE);
+        }
+    }
+}
